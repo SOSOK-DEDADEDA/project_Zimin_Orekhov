@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <h2>{% if register %}Регистрация{% else %}Вход в систему{% endif %}</h2>
+    
+    <form method="POST" {% if register %}onsubmit="return validateForm()"{% endif %}>
+        {% if register %}
+        <!-- Поля для регистрации -->
+        <div class="form-group">
+            <label for="username">Имя пользователя</label>
+            <input type="text" id="username" name="username" required 
+                   pattern="[a-zA-Z][a-zA-Z0-9_]{2,19}" 
+                   title="Имя должно начинаться с буквы и содержать только буквы, цифры и _ (3-20 символов)">
+            <small>От 3 до 20 символов, только буквы, цифры и _</small>
+            <div id="username-check" class="input-hint"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required minlength="8">
+            <small>Минимум 8 символов: заглавные, строчные буквы и цифры</small>
+            <div id="password-strength" class="input-hint"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirm_password">Подтверждение пароля</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <div id="password-match" class="input-hint"></div>
+        </div>
+        {% else %}
+        <!-- Поля для входа -->
+        <div class="form-group">
+            <label for="login_username">Имя пользователя</label>
+            <input type="text" id="login_username" name="login_username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="login_password">Пароль</label>
+            <input type="password" id="login_password" name="login_password" required>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="form-submit">
+            {% if register %}Зарегистрироваться{% else %}Войти{% endif %}
+        </button>
+    </form>
+    
+    <div class="form-footer">
+        {% if register %}
+            <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войдите</a></p>
+        {% else %}
+            <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрируйтесь</a></p>
+        {% endif %}
+    </div>
+</div>
+
+{% if register %}
+<script>
+// Проверка доступности имени пользователя
+function checkUsername() {
+    const username = document.getElementById('username').value;
+    const checkDiv = document.getElementById('username-check');
+    
+    if (username.length < 3) {
+        checkDiv.innerHTML = '<span class="hint-warning">⏳ Минимум 3 символа</span>';
+        checkDiv.className = 'input-hint warning';
+        return;
+    }
+    
+    fetch(`/check_username?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.available) {
+                checkDiv.innerHTML = '<span class="hint-success">✅ ' + data.message + '</span>';
+                checkDiv.className = 'input-hint success';
+            } else {
+                checkDiv.innerHTML = '<span class="hint-error">❌ ' + data.message + '</span>';
+                checkDiv.className = 'input-hint error';
+            }
+        })
+        .catch(error => {
+            checkDiv.innerHTML = '<span class="hint-error">❌ Ошибка проверки</span>';
+            checkDiv.className = 'input-hint error';
+        });
+}
+
+// Проверка сложности пароля
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthDiv = document.getElementById('password-strength');
+            
+            if (!strengthDiv) return;
+            
+            let strength = 0;
+            let messages = [];
+            
+            if (password.length >= 8) strength++;
+            else messages.push('минимум 8 символов');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else messages.push('заглавная буква');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else messages.push('строчная буква');
+            
+            if (/\d/.test(password)) strength++;
+            else messages.push('цифра');
+            
+            let className, icon, text;
+            
+            if (strength === 4) {
+                className = 'success';
+                icon = '✅';
+                text = 'Надежный пароль';
+            } else if (strength >= 2) {
+                className = 'warning';
+                icon = '⚠️';
+                text = 'Средний пароль. Добавьте: ' + messages.join(', ');
+            } else {
+                className = 'error';
+                icon = '❌';
+                text = 'Слабый пароль. Нужно: ' + messages.join(', ');
+            }
+            
+            strengthDiv.innerHTML = `<span class="hint-${className}">${icon} ${text}</span>`;
+            strengthDiv.className = `input-hint ${className}`;
+        });
+    }
+    
+    // Проверка совпадения паролей
+    const confirmInput = document.getElementById('confirm_password');
+    if (confirmInput) {
+        confirmInput.addEventListener('input', function(e) {
+            const password = document.getElementById('password').value;
+            const confirm = e.target.value;
+            const matchDiv = document.getElementById('password-match');
+            
+            if (!matchDiv) return;
+            
+            if (confirm.length === 0) {
+                matchDiv.innerHTML = '';
+                matchDiv.className = 'input-hint';
+            } else if (password === confirm) {
+                matchDiv.innerHTML = '<span class="hint-success">✅ Пароли совпадают</span>';
+                matchDiv.className = 'input-hint success';
+            } else {
+                matchDiv.innerHTML = '<span class="hint-error">❌ Пароли не совпадают</span>';
+                matchDiv.className = 'input-hint error';
+            }
+        });
+    }
+});
+
+// Валидация формы перед отправкой
+function validateForm() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    
+    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/;
+    if (!usernameRegex.test(username)) {
+        alert('Имя пользователя должно начинаться с буквы и содержать только буквы, цифры и _ (3-20 символов)');
+        return false;
+    }
+    
+    if (password.length < 8) {
+        alert('Пароль должен содержать минимум 8 символов');
+        return false;
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        alert('Пароль должен содержать хотя бы одну заглавную букву');
+        return false;
+    }
+    
+    if (!/[a-z]/.test(password)) {
+        alert('Пароль должен содержать хотя бы одну строчную букву');
+        return false;
+    }
+    
+    if (!/\d/.test(password)) {
+        alert('Пароль должен содержать хотя бы одну цифру');
+        return false;
+    }
+    
+    if (password !== confirm) {
+        alert('Пароли не совпадают');
+        return false;
+    }
+    
+    return true;
+}
+
+// Дебаунс для проверки имени
+let timeout;
+const usernameInput = document.getElementById('username');
+if (usernameInput) {
+    usernameInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(checkUsername, 500);
+    });
+    
+    usernameInput.addEventListener('blur', checkUsername);
+}
+</script>
+{% endif %}
+{% endblock %}
