@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Герой-секция -->
+<section class="hero">
+    <h1>Создай свой платформер на Godot!</h1>
+    <p>Курс из 12 уроков для начинающих разработчиков игр</p>
+    {% if session.username %}
+        <a href="#lessons" class="cta-button">Начать обучение</a>
+    {% else %}
+        <a href="{{ url_for('register') }}" class="cta-button">Записаться на курс</a>
+    {% endif %}
+</section>
+
+<!-- Сетка уроков -->
+<section id="lessons">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #1a1a1a;">Доступные уроки</h2>
+    
+    {% if lessons %}
+    <div class="lessons-grid">
+        {% for lesson_id, lesson in lessons.items() %}
+        <div class="lesson-card">
+            <h3>Урок {{ lesson_id }}: {{ lesson.title }}</h3>
+            <p>{{ lesson.content[:100] }}...</p>
+            
+            {% if session.username %}
+                {% set progress = user_results.get(lesson_id, 0) %}
+                <div class="lesson-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="--progress-width: {{ progress }}%;"></div>ы
+                    </div>
+                    <span>{{ progress }}%</span>
+                </div>
+                
+                <a href="{{ url_for('lesson', lesson_id=lesson_id) }}" class="lesson-button">
+                    {% if progress > 0 %}Продолжить{% else %}Начать урок{% endif %}
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="lesson-button">Войдите для доступа</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: #f5f5f5; border-radius: 10px;">
+        <h3>Уроки временно недоступны</h3>
+        <p>Пожалуйста, зайдите позже</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Дополнительная информация -->
+<section style="margin-top: 4rem; text-align: center;">
+    <div style="background: #40E0D0; padding: 2rem; border-radius: 10px; color: #1a1a1a;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Что вы изучите:</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>✔ Основы Godot</div>
+            <div>✔ Создание персонажа</div>
+            <div>✔ Физику и коллизии</div>
+            <div>✔ Уровни и интерфейс</div>
+            <div>✔ Звуки и музыку</div>
+            <div>✔ Публикацию игры</div>
+        </div>
+    </div>
+</section>
+{% endblock %}
