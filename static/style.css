@@ -1,0 +1,872 @@
+:root {
+    --yellow: #FFD700;
+    --turquoise: #40E0D0;
+    --black: #1a1a1a;
+    --white: #ffffff;
+    --gray: #f5f5f5;
+    --error: #ff6b6b;
+    --success: #40E0D0;
+    --warning: #FFD700;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--white) 0%, var(--gray) 100%);
+    color: var(--black);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Навигация */
+.navbar {
+    background: linear-gradient(90deg, var(--black) 0%, #333 100%);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 3px solid var(--turquoise);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.logo span {
+    color: var(--yellow);
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-links a:hover {
+    background: var(--turquoise);
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--yellow);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 80%;
+}
+
+.user-info {
+    color: var(--turquoise);
+    font-weight: bold;
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    width: 100%;
+}
+
+/* Главная страница */
+.hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--turquoise) 100%);
+    border-radius: 15px;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    color: var(--black);
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--black);
+    color: var(--yellow);
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--yellow);
+}
+
+.cta-button:hover {
+    background: var(--yellow);
+    color: var(--black);
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+/* Сетка уроков */
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.lesson-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--turquoise);
+    position: relative;
+    overflow: hidden;
+}
+
+.lesson-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 50%, rgba(64, 224, 208, 0.1) 100%);
+    pointer-events: none;
+}
+
+.lesson-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-left: 4px solid var(--yellow);
+}
+
+.lesson-card h3 {
+    color: var(--black);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.lesson-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.lesson-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--gray);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow), var(--turquoise));
+    transition: width 0.3s ease;
+}
+
+.lesson-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--turquoise);
+    color: var(--black);
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.lesson-button:hover {
+    background: var(--yellow);
+    border-color: var(--black);
+}
+
+/* Страница урока */
+.lesson-container {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.lesson-header {
+    border-bottom: 3px solid var(--turquoise);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.lesson-header h2 {
+    color: var(--black);
+    font-size: 2rem;
+}
+
+.lesson-progress-indicator {
+    background: var(--yellow);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.iframe-container {
+    position: relative;
+    overflow: hidden;
+    padding-top: 56.25%;
+    margin-bottom: 2rem;
+    border: 3px solid var(--turquoise);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.iframe-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Тесты */
+.quiz-section {
+    background: var(--gray);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.quiz-section h3 {
+    color: var(--black);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.quiz-question {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--yellow);
+}
+
+.quiz-question p {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--black);
+}
+
+.quiz-question input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.quiz-question input:focus {
+    outline: none;
+    border-color: var(--turquoise);
+}
+
+.quiz-submit {
+    background: var(--turquoise);
+    color: var(--black);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.quiz-submit:hover {
+    background: var(--yellow);
+    transform: scale(1.02);
+}
+
+.quiz-result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2rem;
+    animation: popIn 0.5s ease;
+}
+
+@keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+.quiz-result.success {
+    background: var(--turquoise);
+    color: var(--black);
+}
+
+.quiz-result.info {
+    background: var(--yellow);
+    color: var(--black);
+}
+
+/* Формы */
+.login-container {
+    max-width: 400px;
+    margin: 4rem auto;
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 3px solid var(--turquoise);
+}
+
+.login-container h2 {
+    color: var(--black);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--black);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--turquoise);
+}
+
+.form-group small {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--turquoise);
+    color: var(--black);
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-submit:hover {
+    background: var(--yellow);
+}
+
+.form-footer {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.form-footer a {
+    color: var(--turquoise);
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Навигация между уроками */
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    padding: 1rem 0;
+    border-top: 2px solid var(--turquoise);
+    border-bottom: 2px solid var(--turquoise);
+}
+
+.nav-button {
+    padding: 0.8rem 1.5rem;
+    background: var(--black);
+    color: var(--yellow);
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid var(--yellow);
+}
+
+.nav-button:hover:not(.disabled) {
+    background: var(--yellow);
+    color: var(--black);
+}
+
+.nav-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Футер */
+.footer {
+    background: var(--black);
+    color: var(--white);
+    text-align: center;
+    padding: 2rem;
+    margin-top: auto;
+    border-top: 3px solid var(--turquoise);
+}
+
+.footer p {
+    margin: 0.5rem 0;
+    color: var(--yellow);
+}
+
+/* Алерты */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    animation: slideDown 0.3s ease;
+}
+
+.alert-success {
+    background: var(--turquoise);
+    color: var(--black);
+    border-left: 4px solid #2e8b57;
+}
+
+.alert-error {
+    background: var(--error);
+    color: white;
+    border-left: 4px solid #8b0000;
+}
+
+.alert-warning {
+    background: var(--warning);
+    color: var(--black);
+    border-left: 4px solid #b8860b;
+}
+
+.alert-info {
+    background: var(--yellow);
+    color: var(--black);
+    border-left: 4px solid #996515;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Подсказки для форм */
+.input-hint {
+    font-size: 0.85rem;
+    min-height: 20px;
+    margin-top: 5px;
+}
+
+.input-hint.success {
+    color: var(--turquoise);
+}
+
+.input-hint.error {
+    color: var(--error);
+}
+
+.input-hint.warning {
+    color: orange;
+}
+
+.hint-success {
+    color: var(--turquoise);
+}
+
+.hint-error {
+    color: var(--error);
+}
+
+.hint-warning {
+    color: orange;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        justify-content: center;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1.1rem;
+    }
+    
+    .lesson-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .lessons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .login-container {
+        margin: 2rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .cta-button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .lesson-card {
+        padding: 1rem;
+    }
+    
+    .quiz-question {
+        padding: 1rem;
+    }
+}
+.progress-fill {
+    width: var(--progress-width);
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow), var(--turquoise));
+    transition: width 0.3s ease;
+}
+/* Стили для дополнительных файлов */
+.additional-files-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--gray);
+    border-radius: 10px;
+}
+
+.additional-files-section h3 {
+    color: var(--black);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.file-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: var(--white);
+    border: 2px solid var(--turquoise);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--black);
+    transition: all 0.3s ease;
+}
+
+.file-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: var(--yellow);
+}
+
+.file-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-name {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Стили для секции трудностей */
+.difficulties-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 10px;
+    border: 2px solid var(--yellow);
+}
+
+.difficulties-section h3 {
+    color: var(--black);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.difficulties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.difficulty-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    background: var(--gray);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.difficulty-item:hover {
+    background: var(--yellow);
+}
+
+.difficulty-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.difficulty-stats {
+    margin-left: auto;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--turquoise);
+}
+
+.difficulties-submit {
+    background: var(--turquoise);
+    color: var(--black);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+}
+
+.difficulties-submit:hover {
+    background: var(--yellow);
+    transform: scale(1.02);
+}
+
+.difficulties-result {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease;
+}
+
+.difficulties-result.success {
+    background: var(--turquoise);
+    color: var(--black);
+}
+
+/* Стили для глобальной статистики */
+.global-stats-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--gray);
+    border-radius: 10px;
+}
+
+.global-stats-section h4 {
+    color: var(--black);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.stats-summary {
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: var(--white);
+    border-radius: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+    color: var(--turquoise);
+    font-weight: bold;
+}
+
+.stats-chart {
+    min-height: 200px;
+}
+
+.chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.chart-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chart-label {
+    width: 100px;
+    font-size: 0.9rem;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    height: 30px;
+}
+
+.chart-bar {
+    height: 20px;
+    background: linear-gradient(90deg, var(--yellow), var(--turquoise));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.chart-value {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--black);
+    min-width: 45px;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 2rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
