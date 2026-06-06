@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container">
+    <!-- Заголовок урока -->
+    <div class="lesson-header">
+        <h2>Урок {{ lesson_id }}: {{ lesson.title }}</h2>
+        <div class="lesson-progress-indicator">
+            Прогресс: {{ user_results.get(lesson_id|string, 0) }}%
+        </div>
+    </div>
+
+    <!-- Содержание урока -->
+    <div class="lesson-content">
+        <p style="margin-bottom: 1.5rem;">{{ lesson.content }}</p>
+        
+        <!-- iframe с материалом -->
+        <div class="iframe-container">
+            <iframe src="{{ lesson.iframe_url }}" allowfullscreen></iframe>
+        </div>
+        
+        <!-- Дополнительные файлы к уроку -->
+        {% if lesson.additional_files %}
+        <div class="additional-files-section">
+            <h3>Дополнительные материалы</h3>
+            <div class="files-grid">
+                {% for file in lesson.additional_files %}
+                <a href="{{ file.url }}" class="file-card" download="{{ file.name }}">
+                    <div class="file-icon">📁</div>
+                    <div class="file-name">{{ file.name }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Навигация между уроками -->
+    <div class="lesson-navigation">
+        {% if lesson_id > 1 %}
+            <a href="{{ url_for('lesson', lesson_id=lesson_id-1) }}" class="nav-button">← Предыдущий урок</a>
+        {% else %}
+            <span class="nav-button disabled">← Предыдущий урок</span>
+        {% endif %}
+        
+        <a href="{{ url_for('index') }}#lessons" class="nav-button">К списку уроков</a>
+        
+        {% if lesson_id < 12 %}
+            <a href="{{ url_for('lesson', lesson_id=lesson_id+1) }}" class="nav-button">Следующий урок →</a>
+        {% else %}
+            <span class="nav-button disabled">Следующий урок →</span>
+        {% endif %}
+    </div>
+
+    <!-- Секция с вопросами о трудностях -->
+    <div class="difficulties-section">
+        <h3>Что было сложным в этом уроке?</h3>
+        <p class="section-description">Отметьте темы, которые вызвали у вас трудности. Это поможет нам улучшить материалы и помочь другим ученикам.</p>
+        
+        <div class="difficulties-grid">
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="interface"> Интерфейс Godot
+                <span class="difficulty-stats" data-part="interface">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="nodes"> Узлы и сцены
+                <span class="difficulty-stats" data-part="nodes">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="scripts"> Скрипты GDScript
+                <span class="difficulty-stats" data-part="scripts">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="physics"> Физика и коллизии
+                <span class="difficulty-stats" data-part="physics">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="animation"> Анимация
+                <span class="difficulty-stats" data-part="animation">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="signals"> Сигналы
+                <span class="difficulty-stats" data-part="signals">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="ui"> Пользовательский интерфейс
+                <span class="difficulty-stats" data-part="ui">0%</span>
+            </label>
+            <label class="difficulty-item">
+                <input type="checkbox" name="difficulty" value="export"> Экспорт игры
+                <span class="difficulty-stats" data-part="export">0%</span>
+            </label>
+        </div>
+        
+        <button onclick="submitDifficulties()" class="difficulties-submit">Отправить обратную связь</button>
+        
+        <!-- Статистика по всем пользователям -->
+        <div class="global-stats-section">
+            <h4>Статистика по уроку</h4>
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span class="stat-label">Всего ответов:</span>
+                    <span class="stat-value" id="total-responses">{{ difficulty_stats.total_responses }}</span>
+                </div>
+            </div>
+            <div class="stats-chart" id="difficulty-chart">
+                <!-- Статистика будет загружена через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Тесты по уроку -->
+    <div class="quiz-section">
+        <h3>Проверьте свои знания</h3>
+        <div id="quiz-questions">
+            {% for question in lesson.quiz.questions %}
+            <div class="quiz-question" data-question="{{ loop.index0 }}">
+                <p>{{ question }}</p>
+                <input type="text" placeholder="Ваш ответ" class="quiz-answer">
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button onclick="submitQuiz()" class="quiz-submit">Проверить ответы</button>
+        
+        <div id="quiz-result" class="quiz-result" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+// Загрузка статистики при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    loadDifficultyStats();
+    
+    // Если пользователь уже отправлял данные, отмечаем его выбор
+    {% if user_difficulties %}
+    try {
+        const userPartsData = {{ user_difficulties.difficult_parts|tojson }};
+        
+        // Проверяем, что данные существуют
+        if (userPartsData) {
+            let parts = [];
+            
+            // Если это уже массив
+            if (Array.isArray(userPartsData)) {
+                parts = userPartsData;
+            } 
+            // Если это строка, пытаемся распарсить
+            else if (typeof userPartsData === 'string') {
+                try {
+                    parts = JSON.parse(userPartsData);
+                } catch {
+                    parts = [userPartsData];
+                }
+            }
+            
+            // Отмечаем чекбоксы
+            parts.forEach(function(part) {
+                if (part) {
+                    const checkbox = document.querySelector('input[value="' + part + '"]');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading user difficulties:', error);
+    }
+    {% endif %}
+});
+
+// Функция для загрузки статистики
+function loadDifficultyStats() {
+    fetch('/get_difficulty_stats/{{ lesson_id }}')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            updateStatsDisplay(data);
+        })
+        .catch(function(error) {
+            console.error('Error loading stats:', error);
+        });
+}
+
+// Обновление отображения статистики
+function updateStatsDisplay(stats) {
+    // Обновляем общее количество ответов
+    const totalResponses = document.getElementById('total-responses');
+    if (totalResponses) {
+        totalResponses.textContent = stats.total_responses || 0;
+    }
+    
+    // Обновляем проценты для каждой части
+    const percentages = stats.percentages || {};
+    
+    // Проходим по всем частям
+    for (var part in percentages) {
+        if (percentages.hasOwnProperty(part)) {
+            var percentage = percentages[part];
+            var statElement = document.querySelector('.difficulty-stats[data-part="' + part + '"]');
+            if (statElement) {
+                statElement.textContent = percentage + '%';
+            }
+        }
+    }
+    
+    // Создаем график статистики
+    createStatsChart(stats);
+}
+
+// Создание визуального отображения статистики
+function createStatsChart(stats) {
+    var chartDiv = document.getElementById('difficulty-chart');
+    if (!chartDiv) return;
+    
+    var percentages = stats.percentages || {};
+    
+    // Проверяем, есть ли данные
+    var hasData = false;
+    for (var key in percentages) {
+        if (percentages.hasOwnProperty(key)) {
+            hasData = true;
+            break;
+        }
+    }
+    
+    if (!hasData) {
+        chartDiv.innerHTML = '<p class="no-data">Пока нет данных. Будьте первым, кто оставит обратную связь!</p>';
+        return;
+    }
+    
+    // Преобразуем объект в массив для сортировки
+    var partsArray = [];
+    for (var part in percentages) {
+        if (percentages.hasOwnProperty(part)) {
+            partsArray.push({
+                name: part,
+                value: percentages[part]
+            });
+        }
+    }
+    
+    // Сортируем по убыванию процента
+    partsArray.sort(function(a, b) {
+        return b.value - a.value;
+    });
+    
+    var chartHtml = '<div class="chart-bars">';
+    
+    for (var i = 0; i < partsArray.length; i++) {
+        var part = partsArray[i].name;
+        var percentage = partsArray[i].value;
+        
+        var partName = '';
+        switch(part) {
+            case 'interface': partName = 'Интерфейс'; break;
+            case 'nodes': partName = 'Узлы и сцены'; break;
+            case 'scripts': partName = 'Скрипты'; break;
+            case 'physics': partName = 'Физика'; break;
+            case 'animation': partName = 'Анимация'; break;
+            case 'signals': partName = 'Сигналы'; break;
+            case 'ui': partName = 'UI'; break;
+            case 'export': partName = 'Экспорт'; break;
+            default: partName = part;
+        }
+        
+        chartHtml += `
+            <div class="chart-bar-container">
+                <div class="chart-label">${partName}</div>
+                <div class="chart-bar-wrapper">
+                    <div class="chart-bar" style="width: ${percentage}%;"></div>
+                    <span class="chart-value">${percentage}%</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    chartHtml += '</div>';
+    chartDiv.innerHTML = chartHtml;
+}
+
+// Функция для отправки информации о трудностях
+function submitDifficulties() {
+    var checkboxes = document.querySelectorAll('input[name="difficulty"]:checked');
+    var difficultParts = [];
+    
+    for (var i = 0; i < checkboxes.length; i++) {
+        difficultParts.push(checkboxes[i].value);
+    }
+    
+    fetch('/submit_difficulties/{{ lesson_id }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ difficult_parts: difficultParts })
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Показываем сообщение об успехе
+            var resultDiv = document.createElement('div');
+            resultDiv.className = 'difficulties-result success';
+            resultDiv.textContent = data.message;
+            document.querySelector('.difficulties-section').appendChild(resultDiv);
+            
+            // Обновляем статистику
+            updateStatsDisplay(data.stats);
+            
+            // Удаляем сообщение через 3 секунды
+            setTimeout(function() {
+                if (resultDiv.parentNode) {
+                    resultDiv.parentNode.removeChild(resultDiv);
+                }
+            }, 3000);
+        } else {
+            alert('Ошибка при отправке');
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('Ошибка при отправке');
+    });
+}
+
+// Функция для отправки ответов на тест
+function submitQuiz() {
+    var answers = [];
+    var questions = document.querySelectorAll('.quiz-question');
+    
+    for (var i = 0; i < questions.length; i++) {
+        var input = questions[i].querySelector('.quiz-answer');
+        answers.push(input.value.trim());
+    }
+    
+    fetch('/submit_quiz/{{ lesson_id }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ answers: answers })
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        var resultDiv = document.getElementById('quiz-result');
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'quiz-result success';
+        resultDiv.textContent = 'Ваш результат: ' + data.percentage + '% (' + data.correct + ' из ' + data.total + ')';
+        
+        // Обновляем прогресс на странице
+        setTimeout(function() {
+            location.reload();
+        }, 2000);
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+    });
+}
+</script>
+
+<style>
+/* Стили для дополнительных файлов */
+.additional-files-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--gray);
+    border-radius: 10px;
+}
+
+.additional-files-section h3 {
+    color: var(--black);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.file-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: var(--white);
+    border: 2px solid var(--turquoise);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--black);
+    transition: all 0.3s ease;
+}
+
+.file-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: var(--yellow);
+}
+
+.file-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-name {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Стили для секции трудностей */
+.difficulties-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 10px;
+    border: 2px solid var(--yellow);
+}
+
+.difficulties-section h3 {
+    color: var(--black);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.difficulties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.difficulty-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    background: var(--gray);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.difficulty-item:hover {
+    background: var(--yellow);
+}
+
+.difficulty-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.difficulty-stats {
+    margin-left: auto;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--turquoise);
+}
+
+.difficulties-submit {
+    background: var(--turquoise);
+    color: var(--black);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+}
+
+.difficulties-submit:hover {
+    background: var(--yellow);
+    transform: scale(1.02);
+}
+
+.difficulties-result {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease;
+}
+
+.difficulties-result.success {
+    background: var(--turquoise);
+    color: var(--black);
+}
+
+/* Стили для глобальной статистики */
+.global-stats-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--gray);
+    border-radius: 10px;
+}
+
+.global-stats-section h4 {
+    color: var(--black);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.stats-summary {
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: var(--white);
+    border-radius: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+    color: var(--turquoise);
+    font-weight: bold;
+}
+
+.stats-chart {
+    min-height: 200px;
+}
+
+.chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.chart-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chart-label {
+    width: 100px;
+    font-size: 0.9rem;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    height: 30px;
+}
+
+.chart-bar {
+    height: 20px;
+    background: linear-gradient(90deg, var(--yellow), var(--turquoise));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.chart-value {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--black);
+    min-width: 45px;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 2rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
