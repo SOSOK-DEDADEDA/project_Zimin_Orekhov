@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+    <h1>🤖 Управление чат-ботом</h1>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem;">
+        <h3 style="margin: 0 0 10px 0;">📊 Статистика</h3>
+        <div id="stats"></div>
+    </div>
+    
+    <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem;">
+        <h3>➕ Добавить новый FAQ</h3>
+        <form id="addFaqForm">
+            <select id="faqLanguage" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:5px;">
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="en">🇬🇧 English</option>
+            </select>
+            <input type="text" id="faqQuestion" placeholder="Вопрос / Question" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <textarea id="faqAnswer" placeholder="Ответ / Answer" rows="4" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:5px;"></textarea>
+            <input type="text" id="faqCategory" placeholder="Категория (регистрация, lessons, etc.)" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <button type="submit" style="padding:10px 20px; background:#667eea; color:white; border:none; border-radius:5px; cursor:pointer;">➕ Добавить</button>
+        </form>
+    </div>
+    
+    <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 10px;">
+        <h3>🗑️ Управление</h3>
+        <button onclick="clearCache()" style="padding:10px 20px; background:#ff9800; color:white; border:none; border-radius:5px; cursor:pointer; margin-right:10px;">🔄 Очистить кэш</button>
+        <button onclick="loadDetailedStats()" style="padding:10px 20px; background:#4caf50; color:white; border:none; border-radius:5px; cursor:pointer;">📈 Детальная статистика</button>
+    </div>
+    
+    <div id="detailedStats" style="margin-top: 2rem; display: none;">
+        <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 10px;">
+            <h3>📊 Детальная статистика</h3>
+            <div id="detailedStatsContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadStats() {
+    try {
+        const response = await fetch('/api/chatbot/stats');
+        const stats = await response.json();
+        document.getElementById('stats').innerHTML = `
+            <p>📚 Всего вопросов: ${stats.total_questions || 0}</p>
+            <p>🇷🇺 Русских вопросов: ${stats.russian_questions || 0}</p>
+            <p>🇬🇧 Английских вопросов: ${stats.english_questions || 0}</p>
+            <p>📁 Категорий: ${stats.categories || 0}</p>
+            <p>📊 Всего запросов: ${stats.total_queries || 0}</p>
+            <p>📈 Точность ответов: ${stats.success_rate || 0}%</p>
+            <p>💾 Размер кэша: ${stats.cache_size || 0}</p>
+            <p>🎯 Попаданий в кэш: ${stats.cache_hits || 0}</p>
+        `;
+    } catch(e) {
+        document.getElementById('stats').innerHTML = '<p>❌ Ошибка загрузки статистики</p>';
+    }
+}
+
+async function loadDetailedStats() {
+    try {
+        const response = await fetch('/api/chatbot/stats/detailed');
+        const stats = await response.json();
+        
+        let userStatsHtml = '';
+        if (stats.user_stats && stats.user_stats.length > 0) {
+            userStatsHtml = '<h4>👥 Активные пользователи:</h4><ul>';
+            for (const user of stats.user_stats) {
+                userStatsHtml += `<li>${user.user_id}: ${user.total_questions} вопросов, интересы: ${user.top_interests.join(', ')}</li>`;
+            }
+            userStatsHtml += '</ul>';
+        }
+        
+        document.getElementById('detailedStatsContent').innerHTML = `
+            <p>🔤 Размер словаря RU: ${stats.vocabulary_size_ru || 0} слов</p>
+            <p>🔤 Размер словаря EN: ${stats.vocabulary_size_en || 0} слов</p>
+            <p>🎯 Топ-намерения:</p>
+            <ul>
+                ${Object.entries(stats.top_intents || {}).map(([k,v]) => `<li>${k}: ${v}</li>`).join('')}
+            </ul>
+            <p>🌐 Распределение языков:</p>
+            <ul>
+                <li>Русский: ${stats.language_distribution?.ru || 0} запросов</li>
+                <li>Английский: ${stats.language_distribution?.en || 0} запросов</li>
+            </ul>
+            ${userStatsHtml}
+            <p>💾 Информация о кэше:</p>
+            <ul>
+                <li>Размер: ${stats.cache_info?.size || 0}</li>
+                <li>Максимум: ${stats.cache_info?.max_size || 0}</li>
+                <li>Попаданий: ${stats.cache_info?.hit_rate || 0}%</li>
+            </ul>
+        `;
+        
+        document.getElementById('detailedStats').style.display = 'block';
+    } catch(e) {
+        alert('Ошибка загрузки детальной статистики');
+    }
+}
+
+document.getElementById('addFaqForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const language = document.getElementById('faqLanguage').value;
+    const question = document.getElementById('faqQuestion').value;
+    const answer = document.getElementById('faqAnswer').value;
+    const category = document.getElementById('faqCategory').value || 'general';
+    
+    if (!question || !answer) {
+        alert('Заполните вопрос и ответ');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/chatbot/add_faq', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, answer, category, language })
+        });
+        
+        if (response.ok) {
+            alert('✅ FAQ успешно добавлен!');
+            document.getElementById('addFaqForm').reset();
+            loadStats();
+        } else {
+            alert('❌ Ошибка при добавлении');
+        }
+    } catch(e) {
+        alert('❌ Ошибка сети');
+    }
+};
+
+async function clearCache() {
+    if (confirm('Очистить кэш чат-бота? Это может временно замедлить ответы.')) {
+        try {
+            const response = await fetch('/api/chatbot/clear_cache', { method: 'POST' });
+            if (response.ok) {
+                alert('✅ Кэш очищен!');
+                loadStats();
+            } else {
+                alert('❌ Ошибка при очистке');
+            }
+        } catch(e) {
+            alert('❌ Ошибка сети');
+        }
+    }
+}
+
+loadStats();
+// Обновляем статистику каждые 30 секунд
+setInterval(loadStats, 30000);
+</script>
+{% endblock %}
