@@ -1,4 +1,4 @@
-# app.py - ПОЛНОСТЬЮ ОБНОВЛЕННЫЙ ФАЙЛ С ПОДДЕРЖКОЙ ПРОДВИНУТОГО ЧАТ-БОТА
+# app.py 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import json
 import os
@@ -258,7 +258,7 @@ def get_difficulty_stats(lesson_id):
         print(f"Ошибка получения статистики: {e}")
         return {'total_responses': 0, 'parts_stats': {}, 'percentages': {}}
 
-# ==================== ОСНОВНЫЕ МАРШРУТЫ ====================
+# ОСНОВНЫЕ МАРШРУТЫ 
 
 @app.route('/')
 def index():
@@ -436,7 +436,7 @@ def check_username():
     
     return jsonify({'available': True, 'message': 'Имя пользователя доступно'})
 
-# ==================== МАРШРУТЫ ДЛЯ ПРОДВИНУТОГО ЧАТ-БОТА ====================
+# МАРШРУТЫ ДЛЯ ПРОДВИНУТОГО ЧАТ-БОТА 
 
 @app.route('/api/chatbot/ask', methods=['POST'])
 def chatbot_ask():
@@ -740,18 +740,18 @@ if __name__ == '__main__':
         print("✅ Создан тестовый пользователь: admin / Admin123")
     
     print("\n" + "="*60)
-    print("🚀 СЕРВЕР УСПЕШНО ЗАПУЩЕН!")
+    print(" СЕРВЕР УСПЕШНО ЗАПУЩЕН!")
     print("="*60)
     print(f"🌐 Адрес: http://127.0.0.1:5000")
-    print(f"👤 Тестовый пользователь: admin")
-    print(f"🔑 Пароль: Admin123")
-    print("\n🤖 ЧАТ-БОТ ДОСТУПЕН НА ВСЕХ СТРАНИЦАХ!")
+    print(f" Тестовый пользователь: admin")
+    print(f" Пароль: Admin123")
+    print("\n ЧАТ-БОТ ДОСТУПЕН НА ВСЕХ СТРАНИЦАХ!")
     print("   Поддерживает русский и английский языки")
     print("   Понимает контекст диалога")
     print("   Запоминает интересы пользователя")
-    print("\n⚙️ Админ-панель чат-бота:")
+    print("\n Админ-панель чат-бота:")
     print(f"   http://127.0.0.1:5000/admin/chatbot")
-    print("\n📊 Статистика доступна в админ-панели")
+    print("\n Статистика доступна в админ-панели")
     print("="*60)
     print("\n💡 Для остановки сервера нажмите Ctrl+C\n")
     
