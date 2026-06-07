@@ -1,0 +1,88 @@
+2026-05-08 02:49:22,470 - chatbot_model - INFO - Инициализация чат-бота
+2026-05-08 02:49:22,524 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-05-08 02:49:22,524 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-05-08 02:49:22,527 - werkzeug - INFO -  * Restarting with stat
+2026-05-08 02:49:35,866 - chatbot_model - INFO - Инициализация чат-бота
+2026-05-08 02:49:35,884 - werkzeug - WARNING -  * Debugger is active!
+2026-05-08 02:49:35,889 - werkzeug - INFO -  * Debugger PIN: 315-276-517
+2026-05-08 02:49:58,011 - chatbot_model - INFO - Инициализация чат-бота
+2026-05-08 02:49:58,050 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-05-08 02:49:58,051 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-05-08 02:49:58,054 - werkzeug - INFO -  * Restarting with stat
+2026-05-08 02:50:07,814 - chatbot_model - INFO - Инициализация чат-бота
+2026-05-08 02:50:07,827 - werkzeug - WARNING -  * Debugger is active!
+2026-05-08 02:50:07,830 - werkzeug - INFO -  * Debugger PIN: 315-276-517
+2026-05-08 02:50:23,060 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:23] "GET / HTTP/1.1" 200 -
+2026-05-08 02:50:23,203 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:23] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-08 02:50:23,291 - sentence_transformers.base.model - INFO - No device provided, using cpu
+2026-05-08 02:50:23,819 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:23,871 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:24,042 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:24,089 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:24,093 - sentence_transformers.base.model - INFO - Loading SentenceTransformer model from sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2.
+2026-05-08 02:50:24,251 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:24,252 - huggingface_hub.utils._http - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-08 02:50:24,289 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:24,448 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:24,487 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
+2026-05-08 02:50:24,655 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:24,695 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:24,856 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:24,894 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:25,054 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:25,216 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:25,258 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:25,725 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:25,894 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:26,054 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/video_preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:26,213 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:26,372 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:26,411 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:26,576 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:26,614 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:26,777 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:26,815 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:26,979 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:27,016 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:27,212 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:27,341 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:27,540 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:27,733 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-08 02:50:27,895 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-05-08 02:50:28,109 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/xet-read-token/e8f8c211226b894fcb81acc59f3b34ba3efd5f42 "HTTP/1.1 200 OK"
+2026-05-08 02:50:30,837 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.model "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:31,010 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/added_tokens.json "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:31,178 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:31,223 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:31,275 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:31,452 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-05-08 02:50:34,624 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:34] "POST /api/chatbot/ask HTTP/1.1" 200 -
+2026-05-08 02:50:34,784 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-05-08 02:50:35,350 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-08 02:50:35,390 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:35,432 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-05-08 02:50:35,609 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-05-08 02:50:36,143 - sentence_transformers.base.model - INFO - Saving model to c:\Users\admin\Desktop\diplom_project\godot_learning_site\models\chatbot_model/sentence_model
+2026-05-08 02:50:39,170 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:39] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:50:39,196 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:39] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:50:40,509 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:40] "[35m[1mPOST /api/chatbot/ask HTTP/1.1[0m" 500 -
+2026-05-08 02:50:47,787 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:47] "[35m[1mPOST /api/chatbot/ask HTTP/1.1[0m" 500 -
+2026-05-08 02:50:51,290 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:51] "POST /api/chatbot/feedback HTTP/1.1" 200 -
+2026-05-08 02:50:54,492 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:50:54] "[35m[1mPOST /api/chatbot/ask HTTP/1.1[0m" 500 -
+2026-05-08 02:51:02,283 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:02] "GET /register HTTP/1.1" 200 -
+2026-05-08 02:51:02,305 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:02] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-08 02:51:02,362 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:02] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:51:04,374 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:04] "GET /check_username?username=KIRIL HTTP/1.1" 200 -
+2026-05-08 02:51:04,600 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:04] "GET /login HTTP/1.1" 200 -
+2026-05-08 02:51:04,611 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-08 02:51:04,656 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:04] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:51:07,028 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:07] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-05-08 02:51:07,039 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:07] "GET / HTTP/1.1" 200 -
+2026-05-08 02:51:07,070 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:07] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-08 02:51:07,110 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:07] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:51:09,922 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:09] "GET /api/chatbot/suggestions HTTP/1.1" 200 -
+2026-05-08 02:51:12,534 - werkzeug - INFO - 127.0.0.1 - - [08/May/2026 02:51:12] "[35m[1mPOST /api/chatbot/ask HTTP/1.1[0m" 500 -
+2026-05-08 03:17:31,830 - werkzeug - INFO -  * Detected change in 'c:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\app.py', reloading
+2026-05-08 03:17:33,495 - werkzeug - INFO -  * Restarting with stat
