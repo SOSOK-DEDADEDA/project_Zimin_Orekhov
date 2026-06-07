@@ -1,0 +1,166 @@
+{
+    "1": {
+        "title": "Введение в Godot и установка",
+        "content": "В этом уроке мы познакомимся с движком Godot и установим его на ваш компьютер. Рассмотрим интерфейс и основные понятия.",
+        "iframe_url": "/static/files/lesson_1.pdf",
+        
+    "additional_files": [
+        {
+            "name": "Проект-пример.zip",
+            "url": "/static/zip/GODOT.zip"
+        }
+    ],
+        
+        "quiz": {
+            "questions": [
+                "Какой язык программирования используется в Godot?",
+                "Какая последняя стабильная версия Godot?",
+                "Godot это бесплатный движок?"
+            ],
+            "correct": ["GDScript", "4.x", "Да"]
+        }
+    },
+    "2": {
+        "title": "Создание первого проекта",
+        "content": "Создадим наш первый проект и настроим сцену для платформера. Изучим основные узлы и сцены.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_2",
+        "quiz": {
+            "questions": [
+                "Какой тип проекта нужно выбрать для 2D игры?",
+                "Как называется основной узел для платформера?",
+                "В каком формате сохраняются сцены?"
+            ],
+            "correct": ["2D", "CharacterBody2D", ".tscn"]
+        }
+    },
+    "3": {
+        "title": "Спрайты и анимация персонажа",
+        "content": "Добавим спрайты и создадим анимации для нашего персонажа. Настроим спрайты и анимации.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_3",
+        "quiz": {
+            "questions": [
+                "Какой узел используется для анимации?",
+                "Сколько кадров в секунду обычно используют для 2D анимации?",
+                "Какой узел отвечает за отображение текстуры?"
+            ],
+            "correct": ["AnimationPlayer", "12", "Sprite2D"]
+        }
+    },
+    "4": {
+        "title": "Физика движения и гравитация",
+        "content": "Настроим физическое движение персонажа и добавим гравитацию. Изучим физические свойства объектов.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_4",
+        "quiz": {
+            "questions": [
+                "Какая функция отвечает за физику в Godot?",
+                "Какой параметр отвечает за гравитацию?",
+                "Что такое Vector2?"
+            ],
+            "correct": ["_physics_process", "gravity", "Двумерный вектор"]
+        }
+    },
+    "5": {
+        "title": "Прыжки и коллизии",
+        "content": "Реализуем прыжки и настроим обработку столкновений. Добавим взаимодействие с платформами.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_5",
+        "quiz": {
+            "questions": [
+                "Какая клавиша обычно используется для прыжка?",
+                "Какой узел отвечает за коллизии?",
+                "Что такое is_on_floor()?"
+            ],
+            "correct": ["Пробел", "CollisionShape2D", "Проверка на земле"]
+        }
+    },
+    "6": {
+        "title": "Создание платформ и препятствий",
+        "content": "Создадим различные типы платформ и препятствий. Научимся создавать уровни.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_6",
+        "quiz": {
+            "questions": [
+                "Какой узел лучше использовать для статичной платформы?",
+                "Как сделать движущуюся платформу?",
+                "Какой тип коллизии у платформы?"
+            ],
+            "correct": ["StaticBody2D", "AnimationPlayer", "Static"]
+        }
+    },
+    "7": {
+        "title": "Сбор предметов",
+        "content": "Добавим собираемые предметы и систему подсчета очков. Создадим монетки и бонусы.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_7",
+        "quiz": {
+            "questions": [
+                "Какой сигнал используется для обнаружения сбора предмета?",
+                "Как удалить предмет после сбора?",
+                "Где хранить счет игры?"
+            ],
+            "correct": ["body_entered", "queue_free()", "В глобальной переменной"]
+        }
+    },
+    "8": {
+        "title": "Враги и опасности",
+        "content": "Добавим врагов и настроим их поведение. Создадим простой ИИ для врагов.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_8",
+        "quiz": {
+            "questions": [
+                "Какой тип узла лучше для врага?",
+                "Как реализовать патрулирование?",
+                "Что происходит при касании врага?"
+            ],
+            "correct": ["CharacterBody2D", "С помощью таймера", "Смерть игрока"]
+        }
+    },
+    "9": {
+        "title": "Несколько уровней",
+        "content": "Создадим систему переключения между уровнями. Научимся сохранять прогресс.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_9",
+        "quiz": {
+            "questions": [
+                "Как загрузить новый уровень?",
+                "Где хранить данные о прогрессе?",
+                "Какой узел помогает менять сцены?"
+            ],
+            "correct": ["change_scene_to_file()", "Autoload", "SceneTree"]
+        }
+    },
+    "10": {
+        "title": "Пользовательский интерфейс",
+        "content": "Создадим меню, счет и интерфейс игры. Добавим кнопки и текстовые поля.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_10",
+        "quiz": {
+            "questions": [
+                "Какой узел используется для текста?",
+                "Как создать кнопку?",
+                "Что такое Control?"
+            ],
+            "correct": ["Label", "Button", "Базовый узел UI"]
+        }
+    },
+    "11": {
+        "title": "Звуки и музыка",
+        "content": "Добавим звуковые эффекты и фоновую музыку. Настроим аудио в игре.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_11",
+        "quiz": {
+            "questions": [
+                "Какой узел проигрывает звук?",
+                "Как сделать зацикленную музыку?",
+                "Какие форматы звука поддерживает Godot?"
+            ],
+            "correct": ["AudioStreamPlayer2D", "Включить loop", "mp3, ogg, wav"]
+        }
+    },
+    "12": {
+        "title": "Сборка и публикация игры",
+        "content": "Соберем готовую игру и опубликуем её. Научимся экспортировать проект.",
+        "iframe_url": "C:\\Users\\admin\\Desktop\\diplom_project\\godot_learning_site\\static\\files\\Lesson_12",
+        "quiz": {
+            "questions": [
+                "В каком меню экспортировать проект?",
+                "Какие платформы поддерживает Godot?",
+                "Что такое экспортный шаблон?"
+            ],
+            "correct": ["Project -> Export", "Windows, Mac, Linux, Web", "Готовая сборка для платформы"]
+        }
+    }
+}
