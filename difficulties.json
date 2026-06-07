@@ -1,0 +1,22 @@
+{
+  "1": {
+    "Fedos": {
+      "difficult_parts": [
+        "interface",
+        "nodes",
+        "scripts",
+        "signals",
+        "ui"
+      ],
+      "date": "2026-03-31 14:44:59"
+    },
+    "KIRIL": {
+      "difficult_parts": [
+        "scripts",
+        "ui",
+        "export"
+      ],
+      "date": "2026-03-31 14:46:12"
+    }
+  }
+}
