@@ -1,0 +1,22 @@
+{
+  "entries": [
+    {
+      "question": "Как зарегистрироваться?",
+      "helpful": false,
+      "timestamp": "2026-05-08 02:50:51",
+      "user": "anonymous"
+    },
+    {
+      "question": "не сохраняется игра, что делать?",
+      "helpful": false,
+      "timestamp": "2026-06-01 01:08:00",
+      "user": "KIRIL"
+    },
+    {
+      "question": "Мой сын не может пройти урок, как сохранить игру?",
+      "helpful": true,
+      "timestamp": "2026-06-06 09:50:01",
+      "user": "KIRIL"
+    }
+  ]
+}
