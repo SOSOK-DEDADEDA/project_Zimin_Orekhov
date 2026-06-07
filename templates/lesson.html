@@ -127,6 +127,100 @@
     </div>
 </div>
 
+<!-- Секция загрузки проекта -->
+<div class="upload-section">
+    <h3>📤 Загрузить выполненное задание</h3>
+    <p class="section-description">
+        Заархивируйте ваш проект в ZIP-файл и загрузите для проверки.
+        Преподаватель сможет посмотреть вашу работу и дать обратную связь.
+    </p>
+    
+    <form id="uploadForm" action="{{ url_for('upload_project', lesson_id=lesson_id) }}" method="POST" enctype="multipart/form-data">
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📦</div>
+            <div class="upload-text">Перетащите ZIP-файл сюда или нажмите для выбора</div>
+            <div class="upload-hint">Поддерживаются ZIP, RAR, 7Z архивы (максимум 50 МБ)</div>
+            <input type="file" name="project_file" id="fileInput" accept=".zip,.rar,.7z,.godot" style="display: none;">
+        </div>
+        <button type="submit" class="upload-btn" id="uploadBtn" style="display: none;">📤 Загрузить проект</button>
+    </form>
+    
+    <div id="uploadProgress" class="upload-progress" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+        </div>
+        <p>Загрузка...</p>
+    </div>
+    
+    <!-- История загрузок пользователя (данные передаются из Python) -->
+    {% if user_submissions %}
+    <div class="submissions-history">
+        <h4>📋 История загрузок</h4>
+        {% for submission in user_submissions %}
+        <div class="submission-item">
+            <div class="submission-info">
+                <span class="submission-filename">📎 {{ submission.filename }}</span>
+                <span class="submission-date">{{ submission.submitted_at }}</span>
+                <span class="submission-size">{{ (submission.file_size / 1024 / 1024) | round(2) }} МБ</span>
+                <span class="submission-status status-{{ submission.status }}">
+                    {% if submission.status == 'pending' %}⏳ На проверке
+                    {% elif submission.status == 'reviewed' %}📝 Проверен
+                    {% elif submission.status == 'accepted' %}✅ Принят
+                    {% elif submission.status == 'rejected' %}❌ Отклонен
+                    {% endif %}
+                </span>
+            </div>
+            {% if submission.status != 'pending' and submission.review_comment %}
+            <div class="submission-comment">
+                💬 <strong>Комментарий преподавателя:</strong> {{ submission.review_comment }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Drag and drop загрузка
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+
+uploadArea.addEventListener('click', () => {
+    fileInput.click();
+});
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+        uploadBtn.style.display = 'block';
+        uploadArea.style.opacity = '0.7';
+    }
+});
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        uploadBtn.style.display = 'block';
+        const fileName = fileInput.files[0].name;
+        document.querySelector('.upload-text').innerHTML = `✅ Выбран файл: ${fileName}`;
+    }
+});
+</script>
+
 <script>
 // Загрузка статистики при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
@@ -137,15 +231,12 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         const userPartsData = {{ user_difficulties.difficult_parts|tojson }};
         
-        // Проверяем, что данные существуют
         if (userPartsData) {
             let parts = [];
             
-            // Если это уже массив
             if (Array.isArray(userPartsData)) {
                 parts = userPartsData;
             } 
-            // Если это строка, пытаемся распарсить
             else if (typeof userPartsData === 'string') {
                 try {
                     parts = JSON.parse(userPartsData);
@@ -154,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Отмечаем чекбоксы
             parts.forEach(function(part) {
                 if (part) {
                     const checkbox = document.querySelector('input[value="' + part + '"]');
@@ -170,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
 });
 
-// Функция для загрузки статистики
 function loadDifficultyStats() {
     fetch('/get_difficulty_stats/{{ lesson_id }}')
         .then(function(response) {
@@ -184,18 +273,14 @@ function loadDifficultyStats() {
         });
 }
 
-// Обновление отображения статистики
 function updateStatsDisplay(stats) {
-    // Обновляем общее количество ответов
     const totalResponses = document.getElementById('total-responses');
     if (totalResponses) {
         totalResponses.textContent = stats.total_responses || 0;
     }
     
-    // Обновляем проценты для каждой части
     const percentages = stats.percentages || {};
     
-    // Проходим по всем частям
     for (var part in percentages) {
         if (percentages.hasOwnProperty(part)) {
             var percentage = percentages[part];
@@ -206,18 +291,15 @@ function updateStatsDisplay(stats) {
         }
     }
     
-    // Создаем график статистики
     createStatsChart(stats);
 }
 
-// Создание визуального отображения статистики
 function createStatsChart(stats) {
     var chartDiv = document.getElementById('difficulty-chart');
     if (!chartDiv) return;
     
     var percentages = stats.percentages || {};
     
-    // Проверяем, есть ли данные
     var hasData = false;
     for (var key in percentages) {
         if (percentages.hasOwnProperty(key)) {
@@ -231,7 +313,6 @@ function createStatsChart(stats) {
         return;
     }
     
-    // Преобразуем объект в массив для сортировки
     var partsArray = [];
     for (var part in percentages) {
         if (percentages.hasOwnProperty(part)) {
@@ -242,7 +323,6 @@ function createStatsChart(stats) {
         }
     }
     
-    // Сортируем по убыванию процента
     partsArray.sort(function(a, b) {
         return b.value - a.value;
     });
@@ -281,7 +361,6 @@ function createStatsChart(stats) {
     chartDiv.innerHTML = chartHtml;
 }
 
-// Функция для отправки информации о трудностях
 function submitDifficulties() {
     var checkboxes = document.querySelectorAll('input[name="difficulty"]:checked');
     var difficultParts = [];
@@ -302,16 +381,13 @@ function submitDifficulties() {
     })
     .then(function(data) {
         if (data.success) {
-            // Показываем сообщение об успехе
             var resultDiv = document.createElement('div');
             resultDiv.className = 'difficulties-result success';
             resultDiv.textContent = data.message;
             document.querySelector('.difficulties-section').appendChild(resultDiv);
             
-            // Обновляем статистику
             updateStatsDisplay(data.stats);
             
-            // Удаляем сообщение через 3 секунды
             setTimeout(function() {
                 if (resultDiv.parentNode) {
                     resultDiv.parentNode.removeChild(resultDiv);
@@ -327,7 +403,6 @@ function submitDifficulties() {
     });
 }
 
-// Функция для отправки ответов на тест
 function submitQuiz() {
     var answers = [];
     var questions = document.querySelectorAll('.quiz-question');
@@ -353,7 +428,6 @@ function submitQuiz() {
         resultDiv.className = 'quiz-result success';
         resultDiv.textContent = 'Ваш результат: ' + data.percentage + '% (' + data.correct + ' из ' + data.total + ')';
         
-        // Обновляем прогресс на странице
         setTimeout(function() {
             location.reload();
         }, 2000);
@@ -589,6 +663,108 @@ function submitQuiz() {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Стили для загрузки файлов */
+.upload-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 15px;
+    border: 2px solid var(--turquoise);
+}
+
+.upload-area {
+    border: 2px dashed var(--turquoise);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area.dragover {
+    background: var(--turquoise);
+    border-color: var(--yellow);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.upload-text {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.upload-btn {
+    margin-top: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--turquoise);
+    color: var(--black);
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.upload-progress {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.submissions-history {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray);
+}
+
+.submissions-history h4 {
+    margin-bottom: 1rem;
+    color: var(--black);
+}
+
+.submission-item {
+    background: var(--gray);
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.submission-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.submission-filename {
+    font-weight: bold;
+}
+
+.submission-date, .submission-size {
+    color: #666;
+}
+
+.status-pending { color: orange; }
+.status-reviewed { color: blue; }
+.status-accepted { color: green; }
+.status-rejected { color: red; }
+
+.submission-comment {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--white);
+    border-radius: 8px;
+    font-size: 0.85rem;
 }
 </style>
 {% endblock %}
