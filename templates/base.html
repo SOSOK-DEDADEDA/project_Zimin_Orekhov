@@ -18,6 +18,7 @@
             <a href="{{ url_for('index') }}">🏠 Главная</a>
             {% if session.username %}
                 <a href="{{ url_for('index') }}#lessons">📚 Уроки</a>
+                 <a href="{{ url_for('my_submissions') }}">📁 Мои работы</a>
                 <span class="user-info">👤 {{ session.username }}</span>
                 <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Выйти</a>
             {% else %}
