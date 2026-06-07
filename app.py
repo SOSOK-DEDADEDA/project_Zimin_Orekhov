@@ -1,9 +1,13 @@
-# app.py 
+# app.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
+
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import json
 import os
 import hashlib
 import re
+import uuid
+import zipfile
+from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime
 from pathlib import Path
@@ -18,43 +22,31 @@ app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Базовый путь к папке проекта
+# ==================== БАЗОВЫЙ ПУТЬ ====================
 BASE_DIR = Path(__file__).parent.absolute()
 
-# Файлы для хранения данных
+# ==================== НАСТРОЙКИ ЗАГРУЗКИ ФАЙЛОВ ====================
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # Максимум 50 МБ
+app.config['UPLOAD_FOLDER'] = BASE_DIR / 'static' / 'uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'zip', 'rar', '7z', 'godot', 'tscn', 'gd'}
+
+# Создаем папку для загрузок
+UPLOAD_FOLDER = BASE_DIR / 'static' / 'uploads'
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
+# Папка для хранения информации о загрузках
+SUBMISSIONS_FILE = BASE_DIR / 'submissions.json'
+
+# ==================== ФАЙЛЫ ДЛЯ ХРАНЕНИЯ ДАННЫХ ====================
 USERS_FILE = BASE_DIR / 'users.json'
 RESULTS_FILE = BASE_DIR / 'results.json'
 LESSONS_FILE = BASE_DIR / 'lessons_data.json'
 DIFFICULTIES_FILE = BASE_DIR / 'difficulties.json'
 
-# Инициализация чат-бота
+# ==================== ИНИЦИАЛИЗАЦИЯ ЧАТ-БОТА ====================
 chatbot_instance = None
 
-def get_chatbot():
-    """Ленивая инициализация продвинутого мультиязычного чат-бота"""
-    global chatbot_instance
-    if chatbot_instance is None:
-        try:
-            print(" Инициализация продвинутого мультиязычного чат-бота...")
-            chatbot_instance = chatbot
-            chatbot_instance.init()
-            stats = chatbot_instance.get_analytics()
-            print(f"✅ Чат-бот успешно инициализирован!")
-            # Исправленные ключи для новой версии бота
-            if 'total_questions_ru' in stats:
-                print(f"    Русских вопросов: {stats['total_questions_ru']}")
-            else:
-                print(f"    База знаний: {stats.get('total_questions_ru', stats.get('total_queries', 0))} вариантов")
-            if 'vocabulary_size_ru' in stats:
-                print(f"   📖 Словарь RU: {stats['vocabulary_size_ru']} слов")
-        except Exception as e:
-            print(f"❌ Ошибка инициализации чат-бота: {e}")
-            import traceback
-            traceback.print_exc()
-            chatbot_instance = None
-    return chatbot_instance
-
-# Декоратор для проверки авторизации
+# ==================== ДЕКОРАТОР (ДОЛЖЕН БЫТЬ ПЕРВЫМ!) ====================
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -64,7 +56,85 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Функция для хеширования паролей
+# ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+
+def allowed_file(filename):
+    """Проверка разрешенного расширения файла"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+def save_submission_info(username, lesson_id, filename, filepath, file_size):
+    """Сохранение информации о загрузке"""
+    try:
+        submissions = {}
+        if SUBMISSIONS_FILE.exists():
+            with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
+                submissions = json.load(f)
+        
+        if username not in submissions:
+            submissions[username] = {}
+        
+        if str(lesson_id) not in submissions[username]:
+            submissions[username][str(lesson_id)] = []
+        
+        submissions[username][str(lesson_id)].append({
+            'filename': filename,
+            'filepath': str(filepath),
+            'file_size': file_size,
+            'submitted_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'status': 'pending'
+        })
+        
+        with open(SUBMISSIONS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(submissions, f, ensure_ascii=False, indent=2)
+        
+        return True
+    except Exception as e:
+        print(f"Ошибка сохранения информации: {e}")
+        return False
+
+def get_user_submissions(username, lesson_id=None):
+    """Получение загрузок пользователя"""
+    try:
+        if not SUBMISSIONS_FILE.exists():
+            return {}
+        
+        with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
+            submissions = json.load(f)
+        
+        if username not in submissions:
+            return {}
+        
+        if lesson_id:
+            return submissions[username].get(str(lesson_id), [])
+        
+        return submissions[username]
+    except Exception as e:
+        print(f"Ошибка загрузки информации: {e}")
+        return {}
+
+def get_chatbot():
+    """Ленивая инициализация продвинутого мультиязычного чат-бота"""
+    global chatbot_instance
+    if chatbot_instance is None:
+        try:
+            print("🔄 Инициализация продвинутого мультиязычного чат-бота...")
+            chatbot_instance = chatbot
+            chatbot_instance.init()
+            stats = chatbot_instance.get_analytics()
+            print(f"✅ Чат-бот успешно инициализирован!")
+            if 'total_questions_ru' in stats:
+                print(f"   📚 Русских вопросов: {stats['total_questions_ru']}")
+            else:
+                print(f"   📚 База знаний: {stats.get('total_questions_ru', stats.get('total_queries', 0))} вариантов")
+            if 'vocabulary_size_ru' in stats:
+                print(f"   📖 Словарь RU: {stats['vocabulary_size_ru']} слов")
+        except Exception as e:
+            print(f"❌ Ошибка инициализации чат-бота: {e}")
+            import traceback
+            traceback.print_exc()
+            chatbot_instance = None
+    return chatbot_instance
+
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -258,7 +328,152 @@ def get_difficulty_stats(lesson_id):
         print(f"Ошибка получения статистики: {e}")
         return {'total_responses': 0, 'parts_stats': {}, 'percentages': {}}
 
-# ОСНОВНЫЕ МАРШРУТЫ 
+# ==================== МАРШРУТЫ ДЛЯ ЗАГРУЗКИ ФАЙЛОВ ====================
+
+@app.route('/upload_project/<int:lesson_id>', methods=['POST'])
+@login_required
+def upload_project(lesson_id):
+    """Загрузка ZIP-файла с выполненным проектом"""
+    try:
+        if 'project_file' not in request.files:
+            flash('Файл не выбран', 'error')
+            return redirect(url_for('lesson', lesson_id=lesson_id))
+        
+        file = request.files['project_file']
+        
+        if file.filename == '':
+            flash('Файл не выбран', 'error')
+            return redirect(url_for('lesson', lesson_id=lesson_id))
+        
+        if not allowed_file(file.filename):
+            flash('Разрешены только ZIP, RAR, 7Z архивы и файлы Godot (.tscn, .gd)', 'error')
+            return redirect(url_for('lesson', lesson_id=lesson_id))
+        
+        original_filename = secure_filename(file.filename)
+        unique_filename = f"{session['username']}_lesson_{lesson_id}_{uuid.uuid4().hex[:8]}_{original_filename}"
+        
+        user_upload_dir = UPLOAD_FOLDER / session['username'] / str(lesson_id)
+        user_upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        filepath = user_upload_dir / unique_filename
+        file.save(filepath)
+        
+        file_size = filepath.stat().st_size
+        
+        save_submission_info(session['username'], lesson_id, original_filename, filepath, file_size)
+        
+        flash(f'✅ Проект успешно загружен! Файл: {original_filename}', 'success')
+        
+    except Exception as e:
+        print(f"Ошибка загрузки: {e}")
+        flash('Ошибка при загрузке файла. Попробуйте позже.', 'error')
+    
+    return redirect(url_for('lesson', lesson_id=lesson_id))
+
+@app.route('/my_submissions')
+@login_required
+def my_submissions():
+    """Страница со всеми загрузками пользователя"""
+    submissions = get_user_submissions(session['username'])
+    lessons = load_lessons()
+    
+    return render_template('my_submissions.html', 
+                         submissions=submissions, 
+                         lessons=lessons)
+
+@app.route('/delete_submission/<int:lesson_id>/<int:submission_index>', methods=['POST'])
+@login_required
+def delete_submission(lesson_id, submission_index):
+    """Удаление загрузки"""
+    try:
+        submissions = {}
+        if SUBMISSIONS_FILE.exists():
+            with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
+                submissions = json.load(f)
+        
+        username = session['username']
+        lesson_key = str(lesson_id)
+        
+        if username in submissions and lesson_key in submissions[username]:
+            if submission_index < len(submissions[username][lesson_key]):
+                file_info = submissions[username][lesson_key][submission_index]
+                filepath = Path(file_info['filepath'])
+                if filepath.exists():
+                    filepath.unlink()
+                
+                submissions[username][lesson_key].pop(submission_index)
+                
+                if not submissions[username][lesson_key]:
+                    del submissions[username][lesson_key]
+                
+                with open(SUBMISSIONS_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(submissions, f, ensure_ascii=False, indent=2)
+                
+                flash('Файл успешно удален', 'success')
+    
+    except Exception as e:
+        print(f"Ошибка удаления: {e}")
+        flash('Ошибка при удалении файла', 'error')
+    
+    return redirect(url_for('my_submissions'))
+
+@app.route('/admin/submissions')
+@login_required
+def admin_submissions():
+    """Просмотр всех загрузок (только для админа)"""
+    if session.get('username') != 'admin':
+        flash('Доступ запрещен', 'error')
+        return redirect(url_for('index'))
+    
+    submissions = {}
+    if SUBMISSIONS_FILE.exists():
+        with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
+            submissions = json.load(f)
+    
+    lessons = load_lessons()
+    
+    return render_template('admin_submissions.html', 
+                         submissions=submissions, 
+                         lessons=lessons)
+
+@app.route('/admin/submissions/<username>/<int:lesson_id>/<int:submission_index>/review', methods=['POST'])
+@login_required
+def review_submission(username, lesson_id, submission_index):
+    """Оценка загрузки (только для админа)"""
+    if session.get('username') != 'admin':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    data = request.json
+    status = data.get('status', 'reviewed')
+    comment = data.get('comment', '')
+    
+    try:
+        submissions = {}
+        if SUBMISSIONS_FILE.exists():
+            with open(SUBMISSIONS_FILE, 'r', encoding='utf-8') as f:
+                submissions = json.load(f)
+        
+        lesson_key = str(lesson_id)
+        
+        if username in submissions and lesson_key in submissions[username]:
+            if submission_index < len(submissions[username][lesson_key]):
+                submissions[username][lesson_key][submission_index]['status'] = status
+                submissions[username][lesson_key][submission_index]['review_comment'] = comment
+                submissions[username][lesson_key][submission_index]['reviewed_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                submissions[username][lesson_key][submission_index]['reviewed_by'] = session['username']
+                
+                with open(SUBMISSIONS_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(submissions, f, ensure_ascii=False, indent=2)
+                
+                return jsonify({'success': True})
+    
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return jsonify({'error': str(e)}), 500
+    
+    return jsonify({'error': 'Не найдено'}), 404
+
+# ==================== ОСНОВНЫЕ МАРШРУТЫ ====================
 
 @app.route('/')
 def index():
@@ -282,12 +497,15 @@ def lesson(lesson_id):
         if str(lesson_id) in difficulties and session['username'] in difficulties[str(lesson_id)]:
             user_difficulties = difficulties[str(lesson_id)][session['username']]
         
+        user_submissions = get_user_submissions(session['username'], lesson_id)
+        
         return render_template('lesson.html', 
                              lesson=lesson_data, 
                              lesson_id=lesson_id,
                              user_results=user_results,
                              difficulty_stats=difficulty_stats,
-                             user_difficulties=user_difficulties)
+                             user_difficulties=user_difficulties,
+                             user_submissions=user_submissions)
     flash('Урок не найден', 'error')
     return redirect(url_for('index'))
 
@@ -436,11 +654,11 @@ def check_username():
     
     return jsonify({'available': True, 'message': 'Имя пользователя доступно'})
 
-# МАРШРУТЫ ДЛЯ ПРОДВИНУТОГО ЧАТ-БОТА 
+# ==================== МАРШРУТЫ ДЛЯ ПРОДВИНУТОГО ЧАТ-БОТА ====================
 
 @app.route('/api/chatbot/ask', methods=['POST'])
 def chatbot_ask():
-    """API для вопросов к чат-боту с поддержкой контекста и мультиязычности"""
+    """API для вопросов к чат-боту"""
     try:
         data = request.json
         question = data.get('question', '').strip()
@@ -452,22 +670,19 @@ def chatbot_ask():
         bot = get_chatbot()
         if bot is None:
             return jsonify({
-                'answer': 'Извините, чат-бот временно недоступен. Попробуйте позже.',
+                'answer': 'Извините, чат-бот временно недоступен.',
                 'confidence': 0,
                 'found': False,
                 'suggestions': ["Как зарегистрироваться?", "How to register?"]
             }), 200
         
-        # Получаем ответ с учетом контекста
         if session.get('username'):
             response = bot.predict_with_context(question, session_id)
         else:
             response = bot.predict(question)
         
-        # Определяем язык ответа
         language = bot.detect_language(question)
         
-        # Сохраняем историю
         try:
             history_file = BASE_DIR / 'chatbot_history.json'
             history = {}
@@ -489,7 +704,6 @@ def chatbot_ask():
                 'user': session.get('username', 'anonymous')
             })
             
-            # Оставляем последние 500 вопросов
             history['questions'] = history['questions'][-500:]
             
             with open(history_file, 'w', encoding='utf-8') as f:
@@ -497,12 +711,9 @@ def chatbot_ask():
         except Exception as e:
             print(f"Ошибка сохранения истории: {e}")
         
-        # Получаем персонализированные предложения
         suggestions = []
         if not response.get('found', False):
             suggestions = bot.get_category_suggestions(session_id, language)
-        elif 'suggestions' in response:
-            suggestions = response['suggestions']
         
         return jsonify({
             'answer': response.get('answer', 'Извините, ответ не найден'),
@@ -518,7 +729,7 @@ def chatbot_ask():
         import traceback
         traceback.print_exc()
         return jsonify({
-            'answer': 'Извините, произошла техническая ошибка. Пожалуйста, попробуйте позже.',
+            'answer': 'Извините, произошла техническая ошибка.',
             'confidence': 0,
             'found': False,
             'suggestions': ["Как зарегистрироваться?", "How to register?"]
@@ -600,7 +811,6 @@ def chatbot_stats():
                 'model_loaded': False
             }
         
-        # Добавляем историю из файла
         history_file = BASE_DIR / 'chatbot_history.json'
         if history_file.exists():
             with open(history_file, 'r', encoding='utf-8') as f:
@@ -624,13 +834,11 @@ def chatbot_detailed_stats():
         if bot:
             stats = bot.get_analytics()
             
-            # Добавляем пользовательскую статистику
             if hasattr(bot, 'user_profiles'):
                 stats['user_stats'] = []
                 for user_id, profile in list(bot.user_profiles.items())[:20]:
                     stats['user_stats'].append(bot.get_user_stats(user_id))
             
-            # Добавляем информацию о кэше
             stats['cache_info'] = {
                 'size': len(bot.cache),
                 'max_size': bot.cache_size,
@@ -688,12 +896,10 @@ def chatbot_set_language():
     try:
         data = request.json
         language = data.get('language', 'ru')
-        session_id = session.get('username', 'anonymous')
         
         bot = get_chatbot()
-        if bot and hasattr(bot, 'user_profiles') and session_id in bot.user_profiles:
-            from advanced_chatbot import Language
-            bot.user_profiles[session_id].preferred_language = Language(language)
+        if bot and hasattr(bot, 'user_profiles') and session.get('username') in bot.user_profiles:
+            bot.user_profiles[session['username']].preferred_language = language
         
         return jsonify({'status': 'success', 'language': language})
     except Exception as e:
@@ -710,11 +916,12 @@ def admin_chatbot():
     return render_template('admin_chatbot.html')
 
 
+# ==================== ЗАПУСК ====================
 if __name__ == '__main__':
     print(f"Проект запущен из: {BASE_DIR}")
     
     # Создаем необходимые файлы
-    for file in [USERS_FILE, RESULTS_FILE, DIFFICULTIES_FILE]:
+    for file in [USERS_FILE, RESULTS_FILE, DIFFICULTIES_FILE, SUBMISSIONS_FILE]:
         if not file.exists():
             with open(file, 'w', encoding='utf-8') as f:
                 json.dump({}, f)
@@ -724,7 +931,7 @@ if __name__ == '__main__':
         load_lessons()
         print(f"✅ Создан файл уроков: {LESSONS_FILE.name}")
     
-    # Создаем папку для файлов
+    # Создаем папки для файлов
     static_files_dir = BASE_DIR / 'static' / 'files'
     static_files_dir.mkdir(parents=True, exist_ok=True)
     
@@ -740,18 +947,18 @@ if __name__ == '__main__':
         print("✅ Создан тестовый пользователь: admin / Admin123")
     
     print("\n" + "="*60)
-    print(" СЕРВЕР УСПЕШНО ЗАПУЩЕН!")
+    print("🚀 СЕРВЕР УСПЕШНО ЗАПУЩЕН!")
     print("="*60)
     print(f"🌐 Адрес: http://127.0.0.1:5000")
-    print(f" Тестовый пользователь: admin")
-    print(f" Пароль: Admin123")
-    print("\n ЧАТ-БОТ ДОСТУПЕН НА ВСЕХ СТРАНИЦАХ!")
+    print(f"👤 Тестовый пользователь: admin")
+    print(f"🔑 Пароль: Admin123")
+    print("\n🤖 ЧАТ-БОТ ДОСТУПЕН НА ВСЕХ СТРАНИЦАХ!")
     print("   Поддерживает русский и английский языки")
     print("   Понимает контекст диалога")
     print("   Запоминает интересы пользователя")
-    print("\n Админ-панель чат-бота:")
+    print("\n⚙️ Админ-панель чат-бота:")
     print(f"   http://127.0.0.1:5000/admin/chatbot")
-    print("\n Статистика доступна в админ-панели")
+    print("\n📊 Статистика доступна в админ-панели")
     print("="*60)
     print("\n💡 Для остановки сервера нажмите Ctrl+C\n")
     
